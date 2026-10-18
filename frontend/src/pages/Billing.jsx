@@ -55,8 +55,6 @@ function Billing({ user, setUser }) {
         description: `${plan.title}-${plan.coins} Interview Coins`,
         order_id: result.data.order.id,
 
-        //
-
         handler: async function (response) {
           console.log("RAZORPAY SUCCESS:", response);
 

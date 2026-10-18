@@ -1,6 +1,5 @@
 import api from "../utils/axios"
 
-
 export const startInterview=async (data)=>{
   try {
     const respose=await api.post("/api/interview/start",data)

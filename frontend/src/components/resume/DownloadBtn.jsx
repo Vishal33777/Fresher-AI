@@ -6,32 +6,44 @@ import { useCoins } from "../../apis/user.api";
 function DownloadBtn({ docRef, user, setUser }) {
   const handlePdf = useReactToPrint({
     contentRef: docRef,
-    DocumentTitle: "FresherAIPDF",
+    documentTitle: "FresherAI-Resume",
   });
 
   const handleDownload = async () => {
     try {
+      // Generate PDF first
+      await handlePdf();
+
+      // Deduct 10 coins after PDF generation
       const coinResponse = await useCoins({
         coins: 10,
         action: "download-pdf",
       });
 
-      await handlePdf();
-
+      // Update user's coin balance
       setUser((prev) => ({
         ...prev,
         interviewCoin: coinResponse?.interviewCoin,
       }));
     } catch (error) {
-      if (error.response?.status === 403) {
-        return alert("Not enough Interview Coins");
+      console.error("PDF download error:", error);
+
+      if (error?.response?.status === 403) {
+        alert("Not enough Interview Coins");
+        return;
       }
-      alert(error.response?.data?.message || "Something went wrong.");
+
+      alert(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong.",
+      );
     }
   };
 
   return (
     <button
+      type="button"
       onClick={handleDownload}
       className="flex items-center gap-2 rounded-lg bg-black px-3 py-2 text-xs text-white"
     >

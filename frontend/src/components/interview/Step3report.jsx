@@ -15,22 +15,41 @@ function Step3report({ report, user, setUser }) {
   const navigate = useNavigate();
   const reportRef = useRef(null);
 
+  // Prevent crashes if report data is not available
+  if (!report) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <p className="text-gray-500 text-sm">Loading interview report...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const questions = report.questions || [];
+  const strengths = report.strengths || [];
+  const weaknesses = report.weaknesses || [];
+  const recommendations = report.recommendations || [];
+
   return (
-    <div className="min-h-screen flex items-center justify-center md:p-5">
+    <div className="min-h-screen flex items-center justify-center md:p-5 bg-white">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-5xl rounded-[24px] bg-gray-100 border border-white/10 overflow-hidden"
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-5xl rounded-[24px] bg-gray-100 overflow-hidden"
       >
-        <div className="border-b border-white/10 px-8 py-6 flex items-center justify-between">
+        {/* Header */}
+        <div className="border-b border-black/10 px-5 sm:px-8 py-6 flex items-center justify-between">
           <div>
-            <div
+            <button
+              type="button"
               onClick={() => navigate("/dashboard")}
               className="inline-flex items-center gap-2 text-white rounded-full border border-black/20 bg-black px-3 py-1.5 cursor-pointer"
             >
               <FiArrowLeft size={14} />
               <span className="text-xs text-zinc-100">Back</span>
-            </div>
+            </button>
 
             <h1 className="text-2xl font-bold text-black mt-2">
               Interview Report
@@ -43,15 +62,17 @@ function Step3report({ report, user, setUser }) {
             <DownloadBtn docRef={reportRef} user={user} setUser={setUser} />
           </div>
 
-          <div className="hidden md:flex items-center gap-2.5 rounded-2xl border border-black/34 bg-black px-4 py-2.5">
+          <div className="hidden md:flex items-center gap-2.5 rounded-2xl border border-black/20 bg-black px-4 py-2.5">
             <FiAward className="text-yellow-400" size={16} />
-
             <span className="text-sm text-white">Completed</span>
           </div>
         </div>
 
-        <div className="p-8" ref={reportRef}>
+        {/* Report Content */}
+        <div className="p-5 sm:p-8" ref={reportRef}>
+          {/* Stats */}
           <div className="grid md:grid-cols-3 gap-5">
+            {/* Overall Score */}
             <div className="rounded-2xl bg-[#17181E] border border-white/10 p-6">
               <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center">
                 <FiTarget size={18} />
@@ -60,11 +81,12 @@ function Step3report({ report, user, setUser }) {
               <p className="mt-5 text-zinc-500 text-xs">Overall Score</p>
 
               <h2 className="mt-2 text-4xl font-bold text-white">
-                {report.overallScore}
+                {report.overallScore ?? 0}
                 <span className="text-lg text-zinc-500">/100</span>
               </h2>
             </div>
 
+            {/* Questions */}
             <div className="rounded-2xl bg-[#17181E] border border-white/10 p-6">
               <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center">
                 <FiTrendingUp size={18} />
@@ -73,10 +95,11 @@ function Step3report({ report, user, setUser }) {
               <p className="mt-5 text-zinc-500 text-xs">Questions</p>
 
               <h2 className="mt-2 text-4xl font-bold text-white">
-                {report.questions.length}
+                {questions.length}
               </h2>
             </div>
 
+            {/* Status */}
             <div className="rounded-2xl bg-[#17181E] border border-white/10 p-6">
               <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center">
                 <FiAward size={18} />
@@ -88,67 +111,79 @@ function Step3report({ report, user, setUser }) {
             </div>
           </div>
 
+          {/* Summary */}
           <div className="mt-6 rounded-2xl bg-[#17181E] border border-white/10 p-6">
             <h3 className="text-lg font-semibold text-white">
               Interview Summary
             </h3>
 
             <p className="mt-3 text-sm leading-7 text-zinc-400">
-              {report.summary}
+              {report.summary || "No summary available."}
             </p>
           </div>
 
+          {/* Strengths & Weaknesses */}
           <div className="grid lg:grid-cols-2 gap-5 mt-6">
+            {/* Strengths */}
             <div className="rounded-2xl bg-[#17181E] border border-green-500/20 p-6">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-lg bg-green-500 flex items-center justify-center">
                   <FiTrendingUp className="text-white" size={16} />
                 </div>
+
                 <h2 className="text-lg font-semibold text-white">Strengths</h2>
               </div>
 
               <div className="mt-5 space-y-3">
-                {report.strengths?.length > 0 ? (
-                  report.strengths?.map((s) => (
+                {strengths.length > 0 ? (
+                  strengths.map((strength, index) => (
                     <div
-                      key={s}
+                      key={index}
                       className="flex items-start gap-3 rounded-xl bg-green-500/5 border border-green-500/10 p-3.5"
                     >
-                      <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-xs">
+                      <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
                         <FiCheck size={16} />
                       </div>
-                      <p className="text-sm text-zinc-300 leading-6">{s}</p>
+
+                      <p className="text-sm text-zinc-300 leading-6">
+                        {strength}
+                      </p>
                     </div>
                   ))
                 ) : (
                   <p className="text-zinc-500 text-sm">
-                    No strengths available
+                    No strengths available.
                   </p>
                 )}
               </div>
             </div>
 
+            {/* Weaknesses */}
             <div className="rounded-2xl bg-[#17181E] border border-red-500/20 p-6">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center">
                   <FiX className="text-white" size={16} />
                 </div>
+
                 <h2 className="text-lg font-semibold text-white">
-                  Areas to Improv
+                  Areas to Improve
                 </h2>
               </div>
 
               <div className="mt-5 space-y-3">
-                {report.weaknesses?.length > 0 ? (
-                  report.weaknesses?.map((s) => (
+                {weaknesses.length > 0 ? (
+                  weaknesses.map((weakness, index) => (
                     <div
-                      key={s}
+                      key={index}
                       className="flex items-start gap-3 rounded-xl bg-red-500/5 border border-red-500/10 p-3.5"
                     >
-                      <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 text-xs">
+                      <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 text-white font-bold">
                         !
                       </div>
-                      <p className="text-sm text-zinc-300 leading-6">{s}</p>
+
+                      <p className="text-sm text-zinc-300 leading-6">
+                        {weakness}
+                      </p>
                     </div>
                   ))
                 ) : (
@@ -158,22 +193,26 @@ function Step3report({ report, user, setUser }) {
             </div>
           </div>
 
+          {/* Recommendations */}
           <div className="mt-6 rounded-2xl bg-[#17181E] border border-white/10 p-6">
             <h3 className="text-lg font-semibold text-white">
               Recommendations
             </h3>
 
             <div className="mt-5 space-y-3">
-              {report.recommendations?.length > 0 ? (
-                report.recommendations?.map((r, i) => (
+              {recommendations.length > 0 ? (
+                recommendations.map((recommendation, index) => (
                   <div
-                    key={i}
+                    key={index}
                     className="flex items-start gap-3.5 rounded-xl border border-white/10 bg-white/[0.03] p-4"
                   >
                     <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center font-semibold flex-shrink-0 text-sm">
-                      {i + 1}
+                      {index + 1}
                     </div>
-                    <p className="text-sm text-zinc-300 leading-6">{r}</p>
+
+                    <p className="text-sm text-zinc-300 leading-6">
+                      {recommendation}
+                    </p>
                   </div>
                 ))
               ) : (
@@ -184,96 +223,119 @@ function Step3report({ report, user, setUser }) {
             </div>
           </div>
 
+          {/* Question Wise Analysis */}
           <div className="mt-8">
             <h3 className="text-xl font-bold text-black mb-5">
               Question Wise Analysis
             </h3>
 
             <div className="space-y-5">
-              {report.questions?.map((item, index) => (
-                <div
-                  key={index}
-                  className="rounded-2xl bg-[#17181E] border border-white/10 p-6"
-                >
-                  <div>
-                    <span className="text-[11px] uppercase tracking-widest text-zinc-500">
-                      Question {index + 1}
-                    </span>
-                    <h4 className="mt-2.5 text-base font-semibold text-white leading-7">
-                      {item.question}
-                    </h4>
-                  </div>
+              {questions.length > 0 ? (
+                questions.map((item, index) => (
+                  <div
+                    key={index}
+                    className="rounded-2xl bg-[#17181E] border border-white/10 p-6"
+                  >
+                    {/* Question */}
+                    <div>
+                      <span className="text-[11px] uppercase tracking-widest text-zinc-500">
+                        Question {index + 1}
+                      </span>
 
-                  <div className="mt-6">
-                    <p className="text-[11px] uppercase tracking-widest text-zinc-500">
-                      Your answer
-                    </p>
-                    <p className="mt-2.5 text-sm leading-6 text-zinc-300">
-                      {item.userAnswer || "No answer submitted"}
-                    </p>
-                  </div>
-
-                  <div className="grid md:grid-cols-4 gap-3.5 mt-6">
-                    <div className="rounded-xl bg-black/20 p-3.5">
-                      <p className="text-xs text-zinc-500">Score</p>
-                      <h5 className="mt-2 text-xl font-bold text-white">
-                        {item.feedback?.score ?? 0}
-                      </h5>
+                      <h4 className="mt-2.5 text-base font-semibold text-white leading-7">
+                        {item.question || "Question unavailable"}
+                      </h4>
                     </div>
 
-                    <div className="rounded-xl bg-black/20 p-3.5">
-                      <p className="text-xs text-zinc-500">Clarity</p>
-                      <h5 className="mt-2 text-xl font-bold text-white">
-                        {item.feedback?.clarity ?? 0}
-                      </h5>
-                    </div>
-
-                    <div className="rounded-xl bg-black/20 p-3.5">
-                      <p className="text-xs text-zinc-500">Relevance</p>
-                      <h5 className="mt-2 text-xl font-bold text-white">
-                        {item.feedback?.relevance ?? 0}
-                      </h5>
-                    </div>
-
-                    <div className="rounded-xl bg-black/20 p-3.5">
-                      <p className="text-xs text-zinc-500">Communication</p>
-                      <h5 className="mt-2 text-xl font-bold text-white">
-                        {item.feedback?.communication ?? 0}
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 rounded-xl border border-green-500/20 bg-green-500/5 p-4.5">
-                    <p className="text-[11px] uppercase tracking-widest text-green-400">
-                      AI Feedback
-                    </p>
-                    <p className="mt-2.5 text-sm leading-6 text-zinc-300">
-                      {item.feedback?.feedback || "No feedback available."}
-                    </p>
-                  </div>
-
-                  {item.feedback?.improvements?.length > 0 && (
+                    {/* User Answer */}
                     <div className="mt-6">
-                      <h5 className="text-sm font-semibold text-white">
-                        Suggested Improvements
-                      </h5>
+                      <p className="text-[11px] uppercase tracking-widest text-zinc-500">
+                        Your Answer
+                      </p>
 
-                      <div className="mt-3.5 space-y-2.5">
-                        {item.feedback.improvements.map((improvement, i) => (
-                          <div
-                            key={i}
-                            className="rounded-lg border border-white/10 bg-white/[0.03] p-3.5"
-                          >
-                            <p className="text-sm text-zinc-300">
-                              ! {improvement}
-                            </p>
-                          </div>
-                        ))}
+                      <p className="mt-2.5 text-sm leading-6 text-zinc-300 whitespace-pre-wrap">
+                        {item.userAnswer || "No answer submitted"}
+                      </p>
+                    </div>
+
+                    {/* Scores */}
+                    <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3.5 mt-6">
+                      <div className="rounded-xl bg-black/20 p-3.5">
+                        <p className="text-xs text-zinc-500">Score</p>
+
+                        <h5 className="mt-2 text-xl font-bold text-white">
+                          {item.feedback?.score ?? 0}
+                        </h5>
+                      </div>
+
+                      <div className="rounded-xl bg-black/20 p-3.5">
+                        <p className="text-xs text-zinc-500">Clarity</p>
+
+                        <h5 className="mt-2 text-xl font-bold text-white">
+                          {item.feedback?.clarity ?? 0}
+                        </h5>
+                      </div>
+
+                      <div className="rounded-xl bg-black/20 p-3.5">
+                        <p className="text-xs text-zinc-500">Relevance</p>
+
+                        <h5 className="mt-2 text-xl font-bold text-white">
+                          {item.feedback?.relevance ?? 0}
+                        </h5>
+                      </div>
+
+                      <div className="rounded-xl bg-black/20 p-3.5">
+                        <p className="text-xs text-zinc-500">Communication</p>
+
+                        <h5 className="mt-2 text-xl font-bold text-white">
+                          {item.feedback?.communication ?? 0}
+                        </h5>
                       </div>
                     </div>
-                  )}
+
+                    {/* AI Feedback */}
+                    <div className="mt-6 rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+                      <p className="text-[11px] uppercase tracking-widest text-green-400">
+                        AI Feedback
+                      </p>
+
+                      <p className="mt-2.5 text-sm leading-6 text-zinc-300">
+                        {item.feedback?.feedback || "No feedback available."}
+                      </p>
+                    </div>
+
+                    {/* Improvements */}
+                    {item.feedback?.improvements?.length > 0 && (
+                      <div className="mt-6">
+                        <h5 className="text-sm font-semibold text-white">
+                          Suggested Improvements
+                        </h5>
+
+                        <div className="mt-3.5 space-y-2.5">
+                          {item.feedback.improvements.map(
+                            (improvement, improvementIndex) => (
+                              <div
+                                key={improvementIndex}
+                                className="rounded-lg border border-white/10 bg-white/[0.03] p-3.5"
+                              >
+                                <p className="text-sm text-zinc-300">
+                                  ! {improvement}
+                                </p>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="rounded-2xl bg-[#17181E] border border-white/10 p-6">
+                  <p className="text-sm text-zinc-500">
+                    No question analysis available.
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

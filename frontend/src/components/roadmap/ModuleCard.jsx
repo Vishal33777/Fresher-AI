@@ -8,7 +8,11 @@ import {
   FiYoutube,
 } from "react-icons/fi";
 
-const difficultyColor = { Easy: "#34d399", Medium: "#a78bfa", Hard: "#f87171" };
+const difficultyColor = {
+  Easy: "#34d399",
+  Medium: "#a78bfa",
+  Hard: "#f87171",
+};
 
 function ModuleCard({ mod, index }) {
   const [open, setOpen] = useState(false);
@@ -17,35 +21,46 @@ function ModuleCard({ mod, index }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.35 }}
+      transition={{
+        delay: index * 0.06,
+        duration: 0.35,
+      }}
       whileHover={{ y: -2 }}
       onClick={() => setOpen(!open)}
-      className="relative overflow-hidden bg-[#000000]/90 backdrop-blur-2xl border border-white/10 rounded-xl cursor-pointer select-none shadow-[0_4px_18px_rgba(0,0,0,0.2)] hover:border-white/20 transition-all"
+      className="relative overflow-hidden bg-black/90 backdrop-blur-2xl border border-white/10 rounded-xl cursor-pointer select-none shadow-[0_4px_18px_rgba(0,0,0,0.2)] hover:border-white/20 transition-all"
     >
-      <div className="relative inset-0 bg-gradient-to-br from-white/[0.07] via-transparent to-transparent pointer-events-none" />
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.07] via-transparent to-transparent pointer-events-none" />
 
+      {/* Header */}
       <div className="relative flex items-center gap-3 p-4">
+        {/* Module Number */}
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold bg-white/5 border border-white/10"
-          style={{ color: difficultyColor[mod.difficulty] }}
+          style={{
+            color: difficultyColor[mod.difficulty] || "#ffffff",
+          }}
         >
           {index + 1}
         </div>
 
+        {/* Module Information */}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-white truncate">{mod.title}</p>
 
           <div className="flex items-center gap-1.5 mt-0.5">
             <FiClock size={10} className="text-white/30" />
+
             <span className="text-xs text-white/35">{mod.duration}</span>
           </div>
         </div>
 
+        {/* Difficulty + Arrow */}
         <div className="flex items-center gap-2">
           <span
             className="text-xs font-medium hidden sm:block"
             style={{
-              color: difficultyColor[mod.difficulty],
+              color: difficultyColor[mod.difficulty] || "#ffffff",
             }}
           >
             {mod.difficulty}
@@ -59,50 +74,62 @@ function ModuleCard({ mod, index }) {
         </div>
       </div>
 
+      {/* Expandable Content */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            initial={{
+              height: 0,
+              opacity: 0,
+            }}
+            animate={{
+              height: "auto",
+              opacity: 1,
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+            }}
+            transition={{
+              duration: 0.22,
+            }}
             className="overflow-hidden"
           >
-            <div className="relative px-4 pb-4 pt-0 border-t border-white/8">
+            <div className="relative px-4 pb-4 pt-0 border-t border-white/10">
+              {/* Description */}
               <p className="text-xs text-white/45 mt-3 mb-3 leading-relaxed">
                 {mod.description}
               </p>
 
+              {/* Action Buttons */}
               <div className="flex gap-2 flex-wrap">
-                <a
+                {/* YouTube */}
+                <motion.a
                   href={mod.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-red-500/25 text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors"
                 >
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-red-500/25 text-red-400 bg-red-10 hover:bg-red-500/20 transition-colors"
-                  >
-                    <FiYoutube size={12} /> Watch Tutorial
-                  </motion.button>
-                </a>
+                  <FiYoutube size={12} />
+                  Watch Tutorial
+                </motion.a>
 
-                <a
+                {/* Article */}
+                <motion.a
                   href={mod.article}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-white/10 text-white/50 bg-white/5 hover:bg-white/10 transition-colors"
                 >
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-white/10 text-white/45 bg-white/10 hover:bg-white/10 transition-colors"
-                  >
-                    <FiBookOpen size={12} /> Read Article
-                  </motion.button>
-                </a>
+                  <FiBookOpen size={12} />
+                  Read Article
+                </motion.a>
               </div>
             </div>
           </motion.div>

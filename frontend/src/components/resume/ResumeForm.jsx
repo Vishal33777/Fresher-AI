@@ -1,12 +1,13 @@
 import React from "react";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 
-function Input({ label, value, onChange, placeholder, type = "text" }) {
+function Input({ label, value = "", onChange, placeholder, type = "text" }) {
   return (
     <div className="flex flex-col gap-1">
       <label className="text-[10px] font-semibold text-black/70 uppercase tracking-wider">
         {label}
       </label>
+
       <input
         type={type}
         placeholder={placeholder}
@@ -18,12 +19,13 @@ function Input({ label, value, onChange, placeholder, type = "text" }) {
   );
 }
 
-function TextArea({ label, value, onChange, placeholder, rows = 3 }) {
+function TextArea({ label, value = "", onChange, placeholder, rows = 3 }) {
   return (
     <div className="flex flex-col gap-1">
       <label className="text-[10px] font-semibold text-black/70 uppercase tracking-wider">
         {label}
       </label>
+
       <textarea
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
@@ -39,73 +41,124 @@ function EntryCard({ children, onRemove }) {
   return (
     <div className="relative overflow-hidden bg-[#F8F9FA] border-2 border-black/15 rounded-xl p-3 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
       <button
+        type="button"
         onClick={onRemove}
         className="absolute top-2.5 right-2.5 z-10 text-black/35 hover:text-red-500 transition-colors"
       >
         <FiTrash2 size={13} />
       </button>
+
       <div className="relative flex flex-col gap-2.5 pr-6">{children}</div>
     </div>
   );
 }
 
 function ResumeForm({ step, data, setData }) {
+  // Safe defaults
+  const experience = data?.experience || [];
+  const projects = data?.projects || [];
+  const education = data?.education || [];
+
+  // =========================
+  // STEP 1 - PERSONAL DETAILS
+  // =========================
   if (step === 1) {
     return (
       <div className="flex flex-col gap-3">
         <Input
           label="Full Name"
           placeholder="Vishal"
-          onChange={(v) => setData({ ...data, name: v })}
-          value={data.name}
+          value={data?.name || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              name: value,
+            }))
+          }
         />
 
         <Input
           label="Email"
           placeholder="vishal@email.com"
-          onChange={(v) => setData({ ...data, email: v })}
-          value={data.email}
+          type="email"
+          value={data?.email || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              email: value,
+            }))
+          }
         />
 
         <Input
           label="Phone"
           placeholder="+91 1234567890"
-          onChange={(v) => setData({ ...data, phone: v })}
-          value={data.phone}
+          type="tel"
+          value={data?.phone || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              phone: value,
+            }))
+          }
         />
 
         <Input
           label="Location"
           placeholder="Noida"
-          onChange={(v) => setData({ ...data, location: v })}
-          value={data.location}
+          value={data?.location || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              location: value,
+            }))
+          }
         />
 
         <Input
           label="LinkedIn URL"
-          placeholder="Linkedin.com/in/vishal"
-          onChange={(v) => setData({ ...data, linkedin: v })}
-          value={data.linkedin}
+          placeholder="linkedin.com/in/vishal"
+          value={data?.linkedin || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              linkedin: value,
+            }))
+          }
         />
 
         <Input
           label="GitHub URL"
           placeholder="github.com/vishal"
-          onChange={(v) => setData({ ...data, github: v })}
-          value={data.github}
+          value={data?.github || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              github: value,
+            }))
+          }
         />
       </div>
     );
   }
+
+  // =========================
+  // STEP 2 - SUMMARY
+  // =========================
   if (step === 2) {
     return (
       <div className="flex flex-col gap-3">
         <TextArea
           label="Professional Summary"
-          placeholder="Backend Developer with 2+ years of experience buildeing scalable Node.js and MongoDB applications..."
+          placeholder="Backend Developer with 2+ years of experience building scalable Node.js and MongoDB applications..."
           rows={5}
-          onChange={(v) => setData({ ...data, summary: v })}
-          value={data.summary}
+          value={data?.summary || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              summary: value,
+            }))
+          }
         />
 
         <p className="text-[10px] text-black/40">
@@ -115,6 +168,9 @@ function ResumeForm({ step, data, setData }) {
     );
   }
 
+  // =========================
+  // STEP 3 - SKILLS
+  // =========================
   if (step === 3) {
     return (
       <div className="flex flex-col gap-3">
@@ -122,8 +178,13 @@ function ResumeForm({ step, data, setData }) {
           label="Skills (comma separated)"
           placeholder="JavaScript, TypeScript, React, Node.js, Express, MongoDB, Redis, Docker, AWS, Git"
           rows={4}
-          onChange={(v) => setData({ ...data, skills: v })}
-          value={data.skills}
+          value={data?.skills || ""}
+          onChange={(value) =>
+            setData((prev) => ({
+              ...prev,
+              skills: value,
+            }))
+          }
         />
 
         <p className="text-[10px] text-black/40">
@@ -133,237 +194,291 @@ function ResumeForm({ step, data, setData }) {
     );
   }
 
+  // =========================
+  // STEP 4 - EXPERIENCE
+  // =========================
   if (step === 4) {
     const addExp = () => {
-      setData({
-        ...data,
+      setData((prev) => ({
+        ...prev,
         experience: [
-          ...data.experience,
-          { company: "", role: "", duration: "", description: "" },
+          ...(prev.experience || []),
+          {
+            company: "",
+            role: "",
+            duration: "",
+            description: "",
+          },
         ],
-      });
+      }));
     };
 
     const removeExp = (index) => {
-      setData({
-        ...data,
-        experience: data.experience.filter((_, i) => i !== index),
-      });
+      setData((prev) => ({
+        ...prev,
+        experience: (prev.experience || []).filter((_, i) => i !== index),
+      }));
     };
 
     const updateExp = (index, field, value) => {
-      const updated = data.experience.map((exp, i) =>
-        i == index ? { ...exp, [field]: value } : exp,
-      );
-      setData({ ...data, experience: updated });
+      setData((prev) => ({
+        ...prev,
+        experience: (prev.experience || []).map((exp, i) =>
+          i === index
+            ? {
+                ...exp,
+                [field]: value,
+              }
+            : exp,
+        ),
+      }));
     };
 
     return (
       <div className="flex flex-col gap-3">
-        {data.experience.length === 0 && (
+        {experience.length === 0 && (
           <p className="text-xs text-black/40 text-center py-3">
             No experience added yet. Click below to add.
           </p>
         )}
 
-        {data.experience.map((exp, index) => (
+        {experience.map((exp, index) => (
           <EntryCard key={index} onRemove={() => removeExp(index)}>
             <Input
               label="Company"
               placeholder="ABC Technologies"
-              onChange={(v) => updateExp(index, "company", v)}
-              value={exp.company}
+              value={exp?.company || ""}
+              onChange={(value) => updateExp(index, "company", value)}
             />
 
             <Input
               label="Role"
               placeholder="Backend Developer"
-              onChange={(v) => updateExp(index, "role", v)}
-              value={exp.role}
+              value={exp?.role || ""}
+              onChange={(value) => updateExp(index, "role", value)}
             />
 
             <Input
               label="Duration"
               placeholder="Jan 2023 - Dec 2024"
-              onChange={(v) => updateExp(index, "duration", v)}
-              value={exp.duration}
+              value={exp?.duration || ""}
+              onChange={(value) => updateExp(index, "duration", value)}
             />
 
             <TextArea
               label="Description"
-              placeholder={"• Built Rest APIs\n• Improved performance by 40%"}
-              onChange={(v) => updateExp(index, "description", v)}
-              value={exp.description}
+              placeholder={"• Built REST APIs\n• Improved performance by 40%"}
+              value={exp?.description || ""}
+              onChange={(value) => updateExp(index, "description", value)}
             />
           </EntryCard>
         ))}
 
         <button
+          type="button"
           onClick={addExp}
           className="flex items-center justify-center gap-1.5 w-full py-2.5 border border-dashed border-black/20 rounded-xl text-xs text-black/45 hover:border-black/40 hover:text-[#0A0A0A] transition-all"
         >
-          <FiPlus size={13} /> Add Experience
+          <FiPlus size={13} />
+          Add Experience
         </button>
       </div>
     );
   }
 
+  // =========================
+  // STEP 5 - PROJECTS
+  // =========================
   if (step === 5) {
     const addPro = () => {
-      setData({
-        ...data,
+      setData((prev) => ({
+        ...prev,
         projects: [
-          ...data.projects,
-          { name: "", techStack: "", github: "", description: "" },
+          ...(prev.projects || []),
+          {
+            name: "",
+            techStack: "",
+            github: "",
+            description: "",
+          },
         ],
-      });
+      }));
     };
 
     const removePro = (index) => {
-      setData({
-        ...data,
-        projects: data.projects.filter((_, i) => i !== index),
-      });
+      setData((prev) => ({
+        ...prev,
+        projects: (prev.projects || []).filter((_, i) => i !== index),
+      }));
     };
 
     const updatePro = (index, field, value) => {
-      const updated = data.projects.map((pro, i) =>
-        i == index ? { ...pro, [field]: value } : pro,
-      );
-      setData({ ...data, projects: updated });
+      setData((prev) => ({
+        ...prev,
+        projects: (prev.projects || []).map((project, i) =>
+          i === index
+            ? {
+                ...project,
+                [field]: value,
+              }
+            : project,
+        ),
+      }));
     };
 
     return (
       <div className="flex flex-col gap-3">
-        {data.projects.length === 0 && (
+        {projects.length === 0 && (
           <p className="text-xs text-black/40 text-center py-3">
             No project added yet. Click below to add.
           </p>
         )}
 
-        {data.projects.map((pro, index) => (
+        {projects.map((project, index) => (
           <EntryCard key={index} onRemove={() => removePro(index)}>
             <Input
               label="Project Name"
               placeholder="InterviewIQ"
-              onChange={(v) => updatePro(index, "name", v)}
-              value={pro.name}
+              value={project?.name || ""}
+              onChange={(value) => updatePro(index, "name", value)}
             />
 
             <Input
               label="Tech Stack"
-              value={pro.techStack}
-              onChange={(v) => updatePro(index, "techStack", v)}
               placeholder="React, Node.js, MongoDB"
+              value={project?.techStack || ""}
+              onChange={(value) => updatePro(index, "techStack", value)}
             />
 
             <Input
               label="GitHub Link"
-              value={pro.github}
-              onChange={(v) => updatePro(index, "github", v)}
               placeholder="github.com/vishal/interviewiq"
+              value={project?.github || ""}
+              onChange={(value) => updatePro(index, "github", value)}
             />
 
             <TextArea
               label="Description"
-              value={pro.description}
-              onChange={(v) => updatePro(index, "description", v)}
-              placeholder="AI powered interview preparation platform with mock interviews and resume builder."
+              placeholder="AI-powered interview preparation platform with mock interviews and resume builder."
+              value={project?.description || ""}
+              onChange={(value) => updatePro(index, "description", value)}
             />
           </EntryCard>
         ))}
 
         <button
+          type="button"
           onClick={addPro}
           className="flex items-center justify-center gap-1.5 w-full py-2.5 border border-dashed border-black/20 rounded-xl text-xs text-black/45 hover:border-black/40 hover:text-[#0A0A0A] transition-all"
         >
-          <FiPlus size={13} /> Add Projects
+          <FiPlus size={13} />
+          Add Project
         </button>
       </div>
     );
   }
 
+  // =========================
+  // STEP 6 - EDUCATION
+  // =========================
   if (step === 6) {
     const addEdu = () => {
-      setData({
-        ...data,
+      setData((prev) => ({
+        ...prev,
         education: [
-          ...data.education,
-          { college: "", degree: "", branch: "", cgpa: "", year: "" },
+          ...(prev.education || []),
+          {
+            college: "",
+            degree: "",
+            branch: "",
+            cgpa: "",
+            year: "",
+          },
         ],
-      });
+      }));
     };
 
     const removeEdu = (index) => {
-      setData({
-        ...data,
-        education: data.education.filter((_, i) => i !== index),
-      });
+      setData((prev) => ({
+        ...prev,
+        education: (prev.education || []).filter((_, i) => i !== index),
+      }));
     };
 
     const updateEdu = (index, field, value) => {
-      const updated = data.education.map((edu, i) =>
-        i == index ? { ...edu, [field]: value } : edu,
-      );
-      setData({ ...data, education: updated });
+      setData((prev) => ({
+        ...prev,
+        education: (prev.education || []).map((education, i) =>
+          i === index
+            ? {
+                ...education,
+                [field]: value,
+              }
+            : education,
+        ),
+      }));
     };
 
     return (
       <div className="flex flex-col gap-3">
-        {data.education.length === 0 && (
+        {education.length === 0 && (
           <p className="text-xs text-black/40 text-center py-3">
-            No Education added yet. Click below to add.
+            No education added yet. Click below to add.
           </p>
         )}
 
-        {data.education.map((edu, index) => (
+        {education.map((edu, index) => (
           <EntryCard key={index} onRemove={() => removeEdu(index)}>
             <Input
               label="College / University"
-              value={edu.college}
-              onChange={(v) => updateEdu(index, "college", v)}
               placeholder="GL Bajaj"
+              value={edu?.college || ""}
+              onChange={(value) => updateEdu(index, "college", value)}
             />
 
             <Input
               label="Degree"
-              value={edu.degree}
-              onChange={(v) => updateEdu(index, "degree", v)}
               placeholder="B.Tech"
+              value={edu?.degree || ""}
+              onChange={(value) => updateEdu(index, "degree", value)}
             />
 
             <Input
               label="Branch"
-              value={edu.branch}
-              onChange={(v) => updateEdu(index, "branch", v)}
               placeholder="CSE"
+              value={edu?.branch || ""}
+              onChange={(value) => updateEdu(index, "branch", value)}
             />
 
             <Input
               label="CGPA"
-              value={edu.cgpa}
-              onChange={(v) => updateEdu(index, "cgpa", v)}
               placeholder="8.6"
+              value={edu?.cgpa || ""}
+              onChange={(value) => updateEdu(index, "cgpa", value)}
             />
 
             <Input
               label="Year"
-              value={edu.year}
-              onChange={(v) => updateEdu(index, "year", v)}
               placeholder="2022 - 2026"
+              value={edu?.year || ""}
+              onChange={(value) => updateEdu(index, "year", value)}
             />
           </EntryCard>
         ))}
 
         <button
+          type="button"
           onClick={addEdu}
           className="flex items-center justify-center gap-1.5 w-full py-2.5 border border-dashed border-black/20 rounded-xl text-xs text-black/45 hover:border-black/40 hover:text-[#0A0A0A] transition-all"
         >
-          <FiPlus size={13} /> Add Education
+          <FiPlus size={13} />
+          Add Education
         </button>
       </div>
     );
   }
+
+  return null;
 }
 
 export default ResumeForm;
