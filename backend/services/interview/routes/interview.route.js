@@ -1,5 +1,5 @@
 import express from "express"
-import { getAllInterviews, getInterview, startInterview, submitAnswer } from "../controllers/interview.Controller.js"
+import { getAllInterviews, getInterview, startInterview, submitAnswer } from "../controllers/interview.controller.js"
 
 const interviewRouter=express.Router()
 interviewRouter.post("/start",startInterview)
